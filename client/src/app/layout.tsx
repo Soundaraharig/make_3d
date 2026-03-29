@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Antigravity3D — 2D to 3D Mesh Converter",
+  title: "HARI's 3D Builder",
   description:
-    "Convert 2D images and multi-angle videos into stunning 3D meshes (.stl/.obj). Powered by computer vision and AI.",
+    "Convert 2D images and live camera snapshots into stunning 3D meshes (.stl/.obj). Powered by computer vision and AI.",
 };
 
 export default function RootLayout({

@@ -16,7 +16,7 @@ class ViewerErrorBoundary extends Component<
     super(props);
     this.state = { hasError: false };
   }
-  static getDerivedStateFromError() {
+  static getDerivedStateFromError(_error: Error) {
     return { hasError: true };
   }
   render() {

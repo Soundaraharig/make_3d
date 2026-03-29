@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, Accept } from "react-dropzone";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
 
@@ -82,11 +82,9 @@ export default function Home() {
   );
 
   /* ─── Dropzone ─── */
-  const accept = (
-    mode === "image"
-      ? { "image/png": [".png"], "image/jpeg": [".jpg", ".jpeg"] }
-      : { "video/mp4": [".mp4"], "video/mpeg": [".mpeg"] }
-  ) as any;
+  const accept: Accept = mode === "image"
+    ? { "image/png": [".png"], "image/jpeg": [".jpg", ".jpeg"] }
+    : { "video/mp4": [".mp4"], "video/mpeg": [".mpeg"] };
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept,
@@ -107,55 +105,38 @@ export default function Home() {
 
   return (
     <>
-      {/* Background */}
+      {/* Immersive Global Background */}
       <div className="bg-mesh" />
 
-      {/* Decorative Particles */}
-      {[...Array(6)].map((_, i) => (
-        <div
-          key={i}
-          className="particle"
-          style={{
-            top: `${15 + i * 14}%`,
-            left: `${10 + i * 15}%`,
-            animationDelay: `${i * 0.8}s`,
-            animationDuration: `${5 + i}s`,
-          }}
-        />
-      ))}
+      {/* Edge-to-Edge 3D Canvas Context */}
+      <ModelViewer modelUrl={modelUrl} modelType={modelType} />
 
-      <main className="relative min-h-screen flex flex-col items-center px-4 py-8 sm:px-8">
-        {/* ─── Header ─── */}
-        <motion.header
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="w-full max-w-5xl text-center mb-10"
+      {/* Floating Dashboard Overlay */}
+      <main className="absolute inset-0 pointer-events-none p-4 sm:p-6 md:p-8 flex items-stretch">
+        
+        {/* Left Sidebar (The Glass Control Panel) */}
+        <motion.div
+          initial={{ opacity: 0, x: -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          className="glass flex flex-col gap-6 w-full max-w-sm sm:max-w-md pointer-events-auto relative z-10 sidebar-scroll overflow-y-auto"
         >
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-3">
-            <span className="gradient-text">Antigravity</span>
-            <span className="text-foreground/90">3D</span>
-          </h1>
-          <p className="text-base sm:text-lg text-foreground/50 max-w-xl mx-auto leading-relaxed">
-            Transform 2D images and videos into stunning 3D meshes — powered by
-            computer vision.
-          </p>
-        </motion.header>
+          {/* Header Branding */}
+          <div className="p-6 pb-2 border-b border-white/5">
+            <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight mb-1">
+              <span className="gradient-text">HARI's 3D </span>
+              <span className="text-foreground/90">Builder</span>
+            </h1>
+            <p className="text-xs sm:text-sm text-foreground/40 leading-relaxed max-w-xs">
+              Transform 2D formats into breathtaking 3D meshes in seconds.
+            </p>
+          </div>
 
-        {/* ─── Content Area ─── */}
-        <div className="w-full max-w-5xl grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Left Column: Controls */}
-          <motion.div
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col gap-5"
-          >
+          <div className="px-6 pb-6 flex flex-col gap-6 flex-1">
             {/* Mode Selector */}
-            <div className="glass p-1.5 flex gap-1" id="mode-selector">
+            <div className="relative flex p-1" id="mode-selector">
               <button
-                id="mode-image"
-                className={`mode-tab flex-1 ${mode === "image" ? "active" : ""}`}
+                className={`mode-tab flex-1 flex justify-center items-center gap-2 ${mode === "image" ? "active" : ""}`}
                 onClick={() => {
                   setMode("image");
                   setStatus("idle");
@@ -163,27 +144,20 @@ export default function Home() {
                   setModelUrl(null);
                 }}
               >
-                <span className="flex items-center justify-center gap-2">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                {mode === "image" && (
+                  <motion.div layoutId="modeTabBg" className="mode-tab-bg" />
+                )}
+                <span className="relative z-10 flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                     <circle cx="8.5" cy="8.5" r="1.5" />
                     <polyline points="21 15 16 10 5 21" />
                   </svg>
-                  Image → 3D
+                  Image
                 </span>
               </button>
               <button
-                id="mode-video"
-                className={`mode-tab flex-1 ${mode === "video" ? "active" : ""}`}
+                className={`mode-tab flex-1 flex justify-center items-center gap-2 ${mode === "video" ? "active" : ""}`}
                 onClick={() => {
                   setMode("video");
                   setStatus("idle");
@@ -191,21 +165,15 @@ export default function Home() {
                   setModelUrl(null);
                 }}
               >
-                <span className="flex items-center justify-center gap-2">
-                  <svg
-                    width="18"
-                    height="18"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
+                {mode === "video" && (
+                  <motion.div layoutId="modeTabBg" className="mode-tab-bg" />
+                )}
+                <span className="relative z-10 flex items-center gap-2">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <polygon points="23 7 16 12 23 17 23 7" />
                     <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
                   </svg>
-                  Video → 3D
+                  Video
                 </span>
               </button>
             </div>
@@ -213,105 +181,66 @@ export default function Home() {
             {/* Dropzone */}
             <div
               {...getRootProps()}
-              id="dropzone"
-              className={`dropzone ${isDragActive ? "active" : ""}`}
+              className={`dropzone overflow-hidden relative group ${isDragActive ? "active" : ""}`}
             >
               <input {...getInputProps()} id="file-input" />
-              <motion.div
-                animate={{ scale: isDragActive ? 1.05 : 1 }}
-                transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              >
+              <motion.div animate={{ scale: isDragActive ? 1.05 : 1 }} transition={{ type: "spring", stiffness: 300, damping: 20 }}>
                 <div className="mb-4">
-                  <svg
-                    className="mx-auto text-foreground/20"
-                    width="56"
-                    height="56"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <motion.svg
+                    className="mx-auto text-primary-light/50 group-hover:text-primary-light transition-colors"
+                    animate={{ y: isDragActive ? -5 : 0 }}
+                    width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"
                   >
                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                     <polyline points="17 8 12 3 7 8" />
                     <line x1="12" y1="3" x2="12" y2="15" />
-                  </svg>
+                  </motion.svg>
                 </div>
-                <p className="text-foreground/60 text-sm mb-1">
+                <p className="text-foreground/70 text-sm mb-1 font-medium">
                   {isDragActive ? (
-                    <span className="text-primary-light font-medium">
-                      Drop it here!
-                    </span>
+                    <span className="text-primary-light">Release to teleport payload</span>
                   ) : (
-                    <>
-                      Drag & drop a{" "}
-                      <span className="text-primary-light font-medium">
-                        {mode === "image" ? "PNG / JPG image" : "MP4 video"}
-                      </span>{" "}
-                      here
-                    </>
+                    <>Drag & drop <span className="text-primary-light">{mode === "image" ? "PNG/JPG" : "MP4"}</span> here</>
                   )}
                 </p>
-                <p className="text-foreground/30 text-xs">
-                  or click to browse files
-                </p>
+                <p className="text-foreground/30 text-xs">or click to browse local files</p>
               </motion.div>
             </div>
 
-            {/* Status */}
+            {/* Status Indicator */}
             <AnimatePresence mode="wait">
               {status !== "idle" && (
                 <motion.div
                   key={status}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="glass-subtle p-4 flex items-center gap-3"
+                  initial={{ opacity: 0, height: 0, y: 10 }}
+                  animate={{ opacity: 1, height: "auto", y: 0 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.95 }}
+                  transition={{ duration: 0.4 }}
+                  className="glass-subtle p-4 flex items-center gap-4 overflow-hidden"
                 >
                   {(status === "uploading" || status === "processing") && (
-                    <div className="spinner" style={{ width: 24, height: 24, borderWidth: 2 }} />
+                    <div className="spinner" style={{ width: 28, height: 28, borderWidth: 2 }} />
                   )}
                   {status === "done" && (
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#22c55e"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
-                      <polyline points="22 4 12 14.01 9 11.01" />
-                    </svg>
+                    <div className="w-7 h-7 rounded-full bg-emerald-500/20 flex items-center justify-center border border-emerald-500/50">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12" />
+                      </svg>
+                    </div>
                   )}
                   {status === "error" && (
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="#ef4444"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <circle cx="12" cy="12" r="10" />
-                      <line x1="15" y1="9" x2="9" y2="15" />
-                      <line x1="9" y1="9" x2="15" y2="15" />
-                    </svg>
+                    <div className="w-7 h-7 rounded-full bg-rose-500/20 flex items-center justify-center border border-rose-500/50">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43f5e" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18" />
+                        <line x1="6" y1="6" x2="18" y2="18" />
+                      </svg>
+                    </div>
                   )}
-                  <div>
-                    <p className="text-sm font-medium text-foreground/80">
-                      {status === "uploading" && "Uploading"}
-                      {status === "processing" && "Processing"}
-                      {status === "done" && "Complete"}
-                      {status === "error" && "Error"}
+                  <div className="flex-1">
+                    <p className="text-sm font-semibold text-foreground/90 uppercase tracking-wide">
+                      {status}
                     </p>
-                    <p className="text-xs text-foreground/40">{statusMsg}</p>
+                    <p className="text-xs text-foreground/50 mt-0.5">{statusMsg}</p>
                   </div>
                 </motion.div>
               )}
@@ -321,112 +250,59 @@ export default function Home() {
             <AnimatePresence>
               {status === "done" && modelUrl && (
                 <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
                 >
-                  <button
-                    id="download-btn"
-                    className="btn-glow w-full justify-center"
-                    onClick={handleDownload}
-                  >
-                    <svg
-                      width="18"
-                      height="18"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
+                  <button className="btn-glow w-full justify-center shadow-lg" onClick={handleDownload}>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
                       <polyline points="7 10 12 15 17 10" />
                       <line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
-                    Download {fileName}
+                    Download Mesh
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
-
-            {/* Info Card */}
-            <div className="glass-subtle p-4">
-              <h3 className="text-xs font-semibold text-foreground/40 uppercase tracking-wider mb-2">
-                How it works
-              </h3>
+            
+            <div className="mt-auto pt-4 border-t border-white/5">
+              <h3 className="text-[10px] font-bold text-foreground/30 uppercase tracking-widest mb-3">Model Engine</h3>
               {mode === "image" ? (
-                <ol className="text-xs text-foreground/50 space-y-1.5 list-decimal list-inside">
-                  <li>Upload a high-contrast PNG or JPG image</li>
-                  <li>OpenCV detects contours from the image</li>
-                  <li>Contours are converted to 3D polygons</li>
-                  <li>Polygons are extruded into a .STL mesh</li>
-                </ol>
+                <ul className="text-[11px] text-foreground/40 space-y-2">
+                  <li className="flex gap-2 items-center"><span className="w-1 h-1 rounded-full bg-primary-light"></span> Edge-detection active</li>
+                  <li className="flex gap-2 items-center"><span className="w-1 h-1 rounded-full bg-primary-light"></span> Shapely polygon extrusion</li>
+                </ul>
               ) : (
-                <ol className="text-xs text-foreground/50 space-y-1.5 list-decimal list-inside">
-                  <li>Upload an MP4 video of your object</li>
-                  <li>Frames are extracted at 2 FPS</li>
-                  <li>AI generates a 3D model from frames</li>
-                  <li>Download the .OBJ mesh file</li>
-                </ol>
+                <ul className="text-[11px] text-foreground/40 space-y-2">
+                  <li className="flex gap-2 items-center"><span className="w-1 h-1 rounded-full bg-primary-light"></span> MP4 Frame sequence extraction</li>
+                  <li className="flex gap-2 items-center"><span className="w-1 h-1 rounded-full bg-primary-light"></span> AI NeRF generator standing by</li>
+                </ul>
               )}
             </div>
-          </motion.div>
+          </div>
+        </motion.div>
 
-          {/* Right Column: 3D Viewer */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col gap-3"
+        {/* Top Right Floating Badges */}
+        <div className="absolute top-4 right-4 sm:top-8 sm:right-8 flex flex-col items-end gap-3 z-10">
+          <motion.div 
+            initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.6 }}
+            className="glass-subtle px-3 py-1.5 flex items-center gap-2 rounded-full"
           >
-            <div className="flex items-center justify-between px-1">
-              <h2 className="text-sm font-semibold text-foreground/60">
-                3D Preview
-              </h2>
-              {modelUrl && (
-                <span
-                  className={`status-badge ${
-                    status === "done"
-                      ? "success"
-                      : status === "error"
-                      ? "error"
-                      : "processing"
-                  }`}
-                >
-                  <span
-                    className="inline-block w-1.5 h-1.5 rounded-full"
-                    style={{
-                      backgroundColor:
-                        status === "done"
-                          ? "#22c55e"
-                          : status === "error"
-                          ? "#ef4444"
-                          : "#06b6d4",
-                    }}
-                  />
-                  {status === "done" ? "Model loaded" : "Loading…"}
-                </span>
-              )}
-            </div>
-
-            <ModelViewer modelUrl={modelUrl} modelType={modelType} />
-
-            <p className="text-xs text-foreground/30 text-center">
-              Click & drag to rotate • Scroll to zoom • Right-click to pan
-            </p>
+            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+            <span className="text-[10px] uppercase font-bold tracking-widest text-foreground/50">Server Online</span>
           </motion.div>
+          
+          {modelUrl && (
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+              className="glass-subtle px-4 py-2 rounded-xl text-right backdrop-blur-xl border-accent/20"
+            >
+              <p className="text-[11px] font-bold text-foreground/50 uppercase tracking-widest mb-1">Canvas Render</p>
+              <p className="text-sm font-medium text-accent">{fileName}</p>
+            </motion.div>
+          )}
         </div>
-
-        {/* ─── Footer ─── */}
-        <motion.footer
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="mt-16 mb-6 text-center text-xs text-foreground/20"
-        >
-          Built with Next.js, FastAPI & React Three Fiber
-        </motion.footer>
       </main>
     </>
   );

@@ -14,12 +14,9 @@ import os
 import uuid
 import trimesh
 
-# ffmpeg-python is optional — gracefully degrade if not installed
-try:
-    import ffmpeg
-    HAS_FFMPEG = True
-except ImportError:
-    HAS_FFMPEG = False
+# ffmpeg-python requires the actual ffmpeg binary on PATH.
+# We force False to safely fallback to OpenCV which works purely in Python.
+HAS_FFMPEG = False
 
 
 def extract_frames(video_path: str, output_dir: str, fps: int = 2) -> str:
@@ -57,7 +54,7 @@ def extract_frames(video_path: str, output_dir: str, fps: int = 2) -> str:
             raise ValueError(f"Could not open video: {video_path}")
 
         video_fps = cap.get(cv2.CAP_PROP_FPS) or 30
-        frame_interval = int(video_fps / fps)
+        frame_interval = max(1, int(video_fps / fps))
         frame_count = 0
         saved_count = 0
 
