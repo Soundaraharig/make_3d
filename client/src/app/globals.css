@@ -223,7 +223,7 @@ body {
   inset: 0;
   width: 100vw;
   height: 100vh;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
   background: transparent; /* No background so we see the stars/mesh behind it */
 }
